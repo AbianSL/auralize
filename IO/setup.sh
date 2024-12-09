@@ -10,4 +10,6 @@ if [ -d venv ]; then
 else
   echo -e "${GREEN}Creating virtual environment...${NC}"
   python3 -m venv venv
+  source venv/bin/activate
+  pip install -r requirements.txt
 fi
