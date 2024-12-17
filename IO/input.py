@@ -1,6 +1,7 @@
 from pathlib import Path
 import librosa
-    
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Audio:
     def __init__(self, audio_path: Path, sr=22050):
@@ -47,6 +48,27 @@ class Audio:
                 Sample rate
         """
         return self._sr
+    
+    def save_spectrogram(self, save_path: Path, verbose=False):
+        """
+            Save spectrogram
+            Args:
+                save_path: Path to save the spectrogram
+        """
+        if verbose:
+            print(f"Saving spectrogram to {save_path}")
+        try:
+            librosa.display.specshow(librosa.power_to_db(self._spectrogram, ref=np.max), sr=self._sr)
+            plt.colorbar(format='%+2.0f dB')
+            plt.savefig(save_path)
+            if verbose:
+                print("Spectrogram saved successfully")
+                print(f"Spectrogram saved to {save_path}")
+                print(f"Spectrogram: {plt.show()}")
+            plt.close()
+        except Exception as e:
+            print(f"Error while saving spectrogram: {e}")
+
     def _generate_spectrogram(self, n_fft=2048, hop_length=512):
         """
             Generate spectrogram
