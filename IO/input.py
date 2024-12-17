@@ -12,13 +12,6 @@ class Audio:
         """
         self.load_new_audio(audio_path, sr)
     
-    def _generate_spectrogram(self, n_fft=2048, hop_length=512):
-        """
-            Generate spectrogram
-            Returns:
-                Spectrogram
-        """
-        return librosa.feature.melspectrogram(y=self._audio, sr=self._sr, n_fft=n_fft, hop_length=hop_length)
 
     def load_new_audio(self, audio_path: Path, sr=22050):
         """
@@ -54,3 +47,10 @@ class Audio:
                 Sample rate
         """
         return self._sr
+    def _generate_spectrogram(self, n_fft=2048, hop_length=512):
+        """
+            Generate spectrogram
+            Returns:
+                Spectrogram
+        """
+        return librosa.feature.melspectrogram(y=self._audio, sr=self._sr, n_fft=n_fft, hop_length=hop_length)
