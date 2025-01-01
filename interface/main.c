@@ -18,7 +18,7 @@ void open_audio_picker() {
     GtkFileFilter *filter;
 
     filter = gtk_file_filter_new();
-    gtk_file_filter_add_suffix(filter, "mp3");
+    gtk_file_filter_add_suffix(filter, "wav");
 
     file_dialog = gtk_file_dialog_new();
     gtk_file_dialog_set_default_filter(file_dialog, filter);
@@ -40,38 +40,71 @@ void classify_audio() {
 
 static void activate(GtkApplication* app, gpointer user_data) {
     GtkWidget *window;
-    GtkWidget *box;
+
+    GtkWidget *menu_box;
+    GtkWidget *h_box;
+    GtkWidget *buttons_box;
+    GtkWidget *output_box;
+
     GtkWidget *button;
     GtkWidget *logo;
+    GtkWidget *output_label;
+    GtkWidget *output_image;
 
     window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW(window), "Auralize");
     gtk_window_set_default_size (GTK_WINDOW(window), 200, 200);
 
-    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    gtk_window_set_child(GTK_WINDOW(window), box);
-    gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
-    gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+    menu_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_window_set_child(GTK_WINDOW(window), menu_box);
+    gtk_widget_set_halign(menu_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(menu_box, GTK_ALIGN_CENTER);
 
     logo = gtk_image_new();
     gtk_image_set_from_file(GTK_IMAGE(logo), "logo.png");
     gtk_image_set_pixel_size(GTK_IMAGE(logo), 200);
-    gtk_box_append(GTK_BOX(box), logo);
+    gtk_box_append(GTK_BOX(menu_box), logo);
+
+    GtkWidget *separator;
+    separator = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
+    gtk_box_append(GTK_BOX(menu_box), separator);
+
+    h_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 10);
+    gtk_box_append(GTK_BOX(menu_box), h_box);
+    gtk_widget_set_halign(h_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(h_box, GTK_ALIGN_CENTER);
+
+    buttons_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_box_append(GTK_BOX(h_box), buttons_box);
+    gtk_widget_set_halign(buttons_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(buttons_box, GTK_ALIGN_CENTER);
+
+    output_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
+    gtk_box_append(GTK_BOX(h_box), output_box);
+    gtk_widget_set_halign(output_box, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(output_box, GTK_ALIGN_CENTER);
 
     button = gtk_button_new_with_label ("Pick audio");
     g_signal_connect(button, "clicked", G_CALLBACK(open_audio_picker), NULL);
-    gtk_box_append(GTK_BOX(box), button);
+    gtk_box_append(GTK_BOX(buttons_box), button);
 
     button = gtk_button_new_with_label("Classify");
     g_signal_connect(button, "clicked", G_CALLBACK(classify_audio), NULL);
-    gtk_box_append(GTK_BOX(box), button);
+    gtk_box_append(GTK_BOX(buttons_box), button);
 
     button = gtk_button_new_with_label ("Quit");
     g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_destroy), window);
-    gtk_box_append(GTK_BOX(box), button);
+    gtk_box_append(GTK_BOX(buttons_box), button);
+
+    output_label = gtk_label_new("Select a file to analyze");
+    gtk_box_append(GTK_BOX(output_box), output_label);
+
+    output_image = gtk_image_new_from_file("logo.png");
+    gtk_image_set_pixel_size(GTK_IMAGE(output_image), 200);
+    gtk_box_append(GTK_BOX(output_box), output_image);
 
     gtk_window_present(GTK_WINDOW(window));
-    gtk_window_maximize(GTK_WINDOW(window));
+    // gtk_window_maximize(GTK_WINDOW(window));
 }
 
 int main(int argc, char** argv) {
