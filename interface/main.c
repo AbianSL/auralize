@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* audio_file_path = NULL;
+char *audio_file_path = NULL;
+GtkWidget *output_label = NULL;
 
 void on_file_picked(GObject *gobject, GAsyncResult *result, gpointer data) {
     GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(data), result, NULL);
@@ -26,7 +27,10 @@ void open_audio_picker() {
 }
 
 void classify_audio() {
-    if (audio_file_path == NULL) return;
+    if (audio_file_path == NULL) {
+        gtk_label_set_text(GTK_LABEL(output_label), "Choose a file first");
+        return;
+    }
     const char* COMMAND_BASE = "python auralize.py ";
     char* command = malloc(strlen(COMMAND_BASE) + strlen(audio_file_path) + 1);
     if (command == NULL) return;
@@ -34,6 +38,7 @@ void classify_audio() {
     strcpy(command, COMMAND_BASE);
     strcat(command, audio_file_path);
     puts(command);
+    gtk_label_set_text(GTK_LABEL(output_label), "Processing...");
     // system(command); // wait until we have the python program for classification
     free(command);
 }
@@ -48,7 +53,6 @@ static void activate(GtkApplication* app, gpointer user_data) {
 
     GtkWidget *button;
     GtkWidget *logo;
-    GtkWidget *output_label;
     GtkWidget *output_image;
 
     window = gtk_application_window_new (app);
@@ -99,7 +103,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     output_label = gtk_label_new("Select a file to analyze");
     gtk_box_append(GTK_BOX(output_box), output_label);
 
-    output_image = gtk_image_new_from_file("logo.png");
+    output_image = gtk_image_new_from_file("spectrogram.png");
     gtk_image_set_pixel_size(GTK_IMAGE(output_image), 200);
     gtk_box_append(GTK_BOX(output_box), output_image);
 
@@ -114,7 +118,7 @@ int main(int argc, char** argv) {
     app = gtk_application_new("si.auralize", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     status = g_application_run(G_APPLICATION (app), argc, argv);
-    g_object_unref (app);
+    g_object_unref(app);
 
     return status;
 }
