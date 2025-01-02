@@ -1,11 +1,13 @@
-#include "gio/gio.h"
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "gio/gio.h"
+
 char *audio_file_path = NULL;
 GtkWidget *output_label = NULL;
+GtkWidget *output_image = NULL;
 
 void on_file_picked(GObject *gobject, GAsyncResult *result, gpointer data) {
     GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(data), result, NULL);
@@ -53,7 +55,6 @@ static void activate(GtkApplication* app, gpointer user_data) {
 
     GtkWidget *button;
     GtkWidget *logo;
-    GtkWidget *output_image;
 
     window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW(window), "Auralize");
