@@ -18,3 +18,7 @@ if not os.path.exists(AUDIO_DIR) or not os.path.isdir(AUDIO_DIR):
 # create the spectrogram directory
 SPEC_DIR.mkdir(parents=True, exist_ok=True)
 
+def convert_file(audio_path, save_path):
+    """Convert an audio file to a spectrogram and save it."""
+    audio = Audio(audio_path)
+    audio.save_spectrogram(save_path)
