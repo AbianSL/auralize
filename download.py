@@ -41,7 +41,7 @@ def download_file(url, save_path):
         print(f"Error al descargar {url}. Código de estado: {response.status_code}")
         return True
 
-def main():
+def download_all_files():
     # Descargar metadatos
     print("Descargando metadatos...")
     download_file(METADATA_URL, METADATA_FILE)
@@ -106,4 +106,4 @@ def main():
     print("Descarga completa.")
 
 if __name__ == "__main__":
-    main()
+    download_all_files()
