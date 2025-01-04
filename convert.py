@@ -1,5 +1,5 @@
 import audio_file_names as afn
-import io.input
+from audio.input import Audio
 
 from pathlib import Path
 import os
