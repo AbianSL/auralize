@@ -11,6 +11,15 @@ AUDIO_DIR = DOWNLOAD_DIR / "audio"
 METADATA_FILE = DOWNLOAD_DIR / "esc50.csv"
 SPEC_DIR = DOWNLOAD_DIR / "spectrograms"
 
+# ANSI escape codes for colors
+GREEN = '\033[32m'
+RED = '\033[31m'
+RESET = '\033[0m'
+
+# Unicode characters for tick and cross
+tick = '\u2713'  # ✅
+cross = '\u2717'  # ❎
+
 # detect if the audio directory exists
 if not os.path.exists(AUDIO_DIR) or not os.path.isdir(AUDIO_DIR):
     print("The directory does not exist. Execute download.py first.")
@@ -52,10 +61,21 @@ def convert_all_files():
                 print("  --reinstall, -r  Volver a descargar todos los archivos")
                 print("  --help, -h     Mostrar este mensaje de ayuda")
                 sys.exit()
-    for audio_path in afn.audio_names:
+    for audio_file in afn.audio_names:
         # -4 to remove the .wav extension
-        save_path = SPEC_DIR / (audio_path[:-4] + ".png")
-        convert_file(audio_path, save_path) 
+        save_path = SPEC_DIR / (audio_file[:-5] + ".png")
+        audio_path = AUDIO_DIR / audio_file
+        if audio_path.exists():
+            if not reinstall_flag and save_path.exists():
+                print(f"{GREEN}{tick}{RESET}")
+                continue
+        try:
+            convert_file(audio_path, save_path)
+            print(f"{GREEN}{tick}{RESET}") 
+        except Exception as e:
+            print(f"{RED}{cross}{RESET}")
+            print(f"Error converting {audio_file}: {e}")
+            continue
 
 if __name__ == "__main__":
     convert_all_files()
