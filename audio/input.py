@@ -14,7 +14,7 @@ class Audio:
         self.load_new_audio(audio_path, sr)
     
 
-    def load_new_audio(self, audio_path: Path, sr=22050):
+    def load_new_audio(self, audio_path: Path, my_sr=22050):
         """
             Load new audio file
             Args:
@@ -22,7 +22,7 @@ class Audio:
                 sr: Sample rate
         """
         self.audio_path = audio_path
-        self._audio, self._sr = librosa.load(audio_path, sr)
+        self._audio, self._sr = librosa.load(audio_path, sr = my_sr)
         self._spectrogram = self._generate_spectrogram()
 
     def get_spectrogram(self):
