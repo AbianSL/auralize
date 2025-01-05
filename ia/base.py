@@ -1,4 +1,4 @@
-from ..IO.input import Audio 
+from ..Audio.input import Audio 
 from ..download import download_all_files
 
 def setup():
