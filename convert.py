@@ -61,21 +61,43 @@ def convert_all_files():
                 print("  --reinstall, -r  Volver a descargar todos los archivos")
                 print("  --help, -h     Mostrar este mensaje de ayuda")
                 sys.exit()
-    for audio_file in afn.audio_names:
-        # -4 to remove the .wav extension
-        save_path = SPEC_DIR / (audio_file[:-5] + ".png")
-        audio_path = AUDIO_DIR / audio_file
-        if audio_path.exists():
-            if not reinstall_flag and save_path.exists():
+
+    if verbose_flag:
+        print("Converting audio files to spectrograms...")
+        from tqdm import tqdm
+        for audio_file in tqdm(afn.audio_names):
+            # -4 to remove the .wav extension
+            save_path = SPEC_DIR / (audio_file[:-5] + ".png")
+            audio_path = AUDIO_DIR / audio_file
+            if save_path.exists():
+                continue
+            if audio_path.exists():
+                if not reinstall_flag and save_path.exists():
+                    continue
+            try:
+                convert_file(audio_path, save_path)
+            except Exception as e:
+                print(f"Error converting {audio_file}: {e}")
+                continue
+    else:
+        for audio_file in afn.audio_names:
+            # -4 to remove the .wav extension
+            save_path = SPEC_DIR / (audio_file[:-5] + ".png")
+            audio_path = AUDIO_DIR / audio_file
+            if save_path.exists():
                 print(f"{GREEN}{tick}{RESET}")
                 continue
-        try:
-            convert_file(audio_path, save_path)
-            print(f"{GREEN}{tick}{RESET}") 
-        except Exception as e:
-            print(f"{RED}{cross}{RESET}")
-            print(f"Error converting {audio_file}: {e}")
-            continue
+            if audio_path.exists():
+                if not reinstall_flag and save_path.exists():
+                    print(f"{GREEN}{tick}{RESET}")
+                    continue
+            try:
+                convert_file(audio_path, save_path)
+                print(f"{GREEN}{tick}{RESET}") 
+            except Exception as e:
+                print(f"{RED}{cross}{RESET}")
+                print(f"Error converting {audio_file}: {e}")
+                continue
 
 if __name__ == "__main__":
     convert_all_files()
