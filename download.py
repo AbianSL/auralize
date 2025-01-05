@@ -28,27 +28,32 @@ METADATA_FILE = DOWNLOAD_DIR / "esc50.csv"
 AUDIO_DIR.mkdir(parents=True, exist_ok=True)
 
 def download_file(url, save_path):
-    """Descarga un archivo desde una URL y lo guarda localmente."""
-    print(f"Descargando {url}...")
+    """
+        Download a file from a URL and save it to a local path
+        Args:
+            url: URL to download the file from
+            save_path: Path to save the downloaded file
+    """
+    print(f"Downloading {url}...")
     response = requests.get(url, stream=True)
     if response.status_code == 200:
         with open(save_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
-        print(f"Archivo guardado en {save_path}")
+        print(f"file save in {save_path}")
         return False
     else:
-        print(f"Error al descargar {url}. Código de estado: {response.status_code}")
+        print(f"Error on downling {url}. state code: {response.status_code}")
         return True
 
 def download_all_files():
-    # Descargar metadatos
-    print("Descargando metadatos...")
+    # Download metadata
+    print("Downloading metadata...")
     download_file(METADATA_URL, METADATA_FILE)
 
-    # Descargar archivos de audio
-    print("Descargando archivos de audio...")
-    
+    # Download audio files 
+    print("Downloading audio files...")
+
     verbose_flag = False
     reinstall_flag = False
 
@@ -65,14 +70,14 @@ def download_all_files():
             if sys.argv[i] == "--reinstall" or sys.argv[i] == "-r":
                 reinstall_flag = True
             if sys.argv[i] == "--help" or sys.argv[i] == "-h":
-                print("Uso: python setup.py [opciones]")
-                print("Opciones:")
-                print("  --small, -s    Descargar una octava parte de los archivos")
-                print("  --medium, -m   Descargar un cuarto de los archivos")
-                print("  --large, -l    Descargar la mitad de los archivos")
-                print("  --verbose, -v  Mostrar mensajes detallados")
-                print("  --reinstall, -r  Volver a descargar todos los archivos")
-                print("  --help, -h     Mostrar este mensaje de ayuda")
+                print("Usage: python download.py [OPTION]")
+                print("Options:")
+                print("  --small, -s\t\tDownload only 1/8 of the audio files")
+                print("  --medium, -m\t\tDownload only 1/4 of the audio files")
+                print("  --large, -l\t\tDownload only 1/2 of the audio files")
+                print("  --verbose, -v\t\tShow progress bar")
+                print("  --reinstall, -r\tReinstall all audio files")
+                print("  --help, -h\t\tShow this help message")
                 sys.exit() 
     if verbose_flag:
         from tqdm import tqdm
@@ -89,8 +94,10 @@ def download_all_files():
                 print(f"{GREEN}{tick}{RESET}")
             print()
     else:
-        print(f"{RED}Son 2000 archivos, esto puede tardar un rato.{RESET}")
-        sleep(2)
+        if len(afn.audio_names) > 500:
+            print(f"{RED}Warning: {len(afn.audio_names)} files will be downloaded. This may take a while.{RESET}")
+            sleep(2)
+
         for filename in afn.audio_names:
             if not reinstall_flag and (AUDIO_DIR / filename).exists():
                 print(f"{GREEN}{tick}{RESET}")
