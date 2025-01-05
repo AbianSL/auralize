@@ -33,6 +33,23 @@ def convert_file(audio_path, save_path):
     audio = Audio(audio_path)
     audio.save_spectrogram(save_path)
 
+def change_metadata(metadata_path):
+    """ Change the metadata file from .wav to .png
+        Args:
+            metadata_path: Path to the metadata file
+    """
+    try:
+        with open(metadata_path, "r") as f:
+            lines = f.readlines()
+            for i in range(len(lines)):
+                lines[i] = lines[i].replace(".wav", ".png")
+        with open(metadata_path, "w") as f:
+            f.writelines(lines)
+    except Exception as e:
+        print(f"Error changing metadata: {e}")
+        print(f"{RED}{cross}{RESET}")
+        exit()
+
 def convert_all_files():
     """Convert all audio files to spectrograms."""
     
@@ -100,5 +117,9 @@ def convert_all_files():
                 continue
 
 if __name__ == "__main__":
+    print("Converting audio files to spectrograms...")
     convert_all_files()
-    print("Conversion complete.")
+    print(f"{GREEN}{tick}{RESET}")
+    print("Changing metadata file...")
+    change_metadata(METADATA_FILE)
+    print(f"{GREEN}{tick}{RESET}")
