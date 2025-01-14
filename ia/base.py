@@ -79,9 +79,20 @@ class SpectrogramTrainer:
         pass 
 
 if __name__ == "__main__":
+
+    # Supongamos que estas son las etiquetas de tu conjunto de datos:
+    labels = [0, 2, 1, 0]
+    
+    # Convertimos a one-hot encoding:
+    one_hot_labels = to_categorical(labels)
+    
+    print(one_hot_labels)
+    
+    pass
     spectrogram_dir = Path("data/spectrograms")
     label_csv = Path("data/labels.csv")
     model_dir = Path("models")
     trainer = SpectrogramTrainer(spectrogram_dir, label_csv, model_dir)
     print(trainer.spectrograms)
+    trainer.train()
     
