@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "gio/gio.h"
+#include "glib.h"
 
 char *audio_file_path = NULL;
 GtkWidget *output_label = NULL;
@@ -33,15 +34,19 @@ void classify_audio() {
         gtk_label_set_text(GTK_LABEL(output_label), "Choose a file first");
         return;
     }
-    const char* COMMAND_BASE = "python auralize.py ";
+    const char* COMMAND_BASE = "python generate_spectrogram.py ";
     char* command = malloc(strlen(COMMAND_BASE) + strlen(audio_file_path) + 1);
     if (command == NULL) return;
-
     strcpy(command, COMMAND_BASE);
     strcat(command, audio_file_path);
     puts(command);
-    gtk_label_set_text(GTK_LABEL(output_label), "Processing...");
-    // system(command); // wait until we have the python program for classification
+    gtk_label_set_text(GTK_LABEL(output_label), "Generating spectrogram...");
+    int exit_code = system(command);
+    if (exit_code) {
+        gtk_label_set_text(GTK_LABEL(output_label), "Error generating spectrogram");
+        return;
+    }
+    gtk_image_set_from_file(GTK_IMAGE(output_image), "spectrogram.png");
     free(command);
 }
 
@@ -104,7 +109,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     output_label = gtk_label_new("Select a file to analyze");
     gtk_box_append(GTK_BOX(output_box), output_label);
 
-    output_image = gtk_image_new_from_file("spectrogram.png");
+    output_image = gtk_image_new_from_file("spectrogram_example.png");
     gtk_image_set_pixel_size(GTK_IMAGE(output_image), 200);
     gtk_box_append(GTK_BOX(output_box), output_image);
 
