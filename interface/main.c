@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "gio/gio.h"
 #include "glib.h"
@@ -9,6 +10,35 @@
 char *audio_file_path = NULL;
 GtkWidget *output_label = NULL;
 GtkWidget *output_image = NULL;
+FILE *auralize_backend = NULL;
+GThread *backend_thread = NULL;
+
+int pipe_front2back[2];
+
+gpointer handle_backend(gpointer data) {
+    pid_t pid = 0;
+    int pipe_back2py [2];
+    int pipe_py2back [2];
+    char buf[256];
+    char msg[256];
+    int status;
+
+    pipe(pipe_back2py);
+    pipe(pipe_py2back);
+    pid = fork();
+    if (pid == 0) {
+        // python process
+        dup2(pipe_back2py[0], STDIN_FILENO);
+        dup2(pipe_py2back[1], STDOUT_FILENO);
+        close(pipe_back2py[1]);
+        close(pipe_py2back[0]);
+        execl("python", "auralize.py");
+        exit(1);
+    }
+    // back process
+
+    return NULL;
+}
 
 void on_file_picked(GObject *gobject, GAsyncResult *result, gpointer data) {
     GFile *file = gtk_file_dialog_open_finish(GTK_FILE_DIALOG(data), result, NULL);
@@ -29,25 +59,32 @@ void open_audio_picker() {
     gtk_file_dialog_open(file_dialog, NULL, NULL, on_file_picked, file_dialog);
 }
 
-void classify_audio() {
+gpointer generate_spectrogram(gpointer data) {
     if (audio_file_path == NULL) {
         gtk_label_set_text(GTK_LABEL(output_label), "Choose a file first");
-        return;
+        return false;
     }
-    const char* COMMAND_BASE = "python generate_spectrogram.py ";
+    gtk_label_set_text(GTK_LABEL(output_label), "Generating spectrogram...");
+    const char* COMMAND_BASE = "python auralize.py ";
     char* command = malloc(strlen(COMMAND_BASE) + strlen(audio_file_path) + 1);
-    if (command == NULL) return;
+    if (command == NULL) return false;
     strcpy(command, COMMAND_BASE);
     strcat(command, audio_file_path);
     puts(command);
-    gtk_label_set_text(GTK_LABEL(output_label), "Generating spectrogram...");
     int exit_code = system(command);
     if (exit_code) {
         gtk_label_set_text(GTK_LABEL(output_label), "Error generating spectrogram");
-        return;
+        return false;
     }
     gtk_image_set_from_file(GTK_IMAGE(output_image), "spectrogram.png");
+    gtk_label_set_text(GTK_LABEL(output_label), "Spectrogram generated");
     free(command);
+    puts("finished spectrogram");
+    return false;
+}
+
+void classify_audio() {
+    backend_thread = g_thread_new("auralize.spectrogram_thread", generate_spectrogram, NULL);
 }
 
 static void activate(GtkApplication* app, gpointer user_data) {
@@ -60,6 +97,11 @@ static void activate(GtkApplication* app, gpointer user_data) {
 
     GtkWidget *button;
     GtkWidget *logo;
+
+    if (pipe(pipe_front2back) < 0) {
+        puts("pipe error");
+        return;
+    }
 
     window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW(window), "Auralize");
@@ -114,7 +156,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     gtk_box_append(GTK_BOX(output_box), output_image);
 
     gtk_window_present(GTK_WINDOW(window));
-    // gtk_window_maximize(GTK_WINDOW(window));
+    gtk_window_maximize(GTK_WINDOW(window));
 }
 
 int main(int argc, char** argv) {
@@ -124,6 +166,7 @@ int main(int argc, char** argv) {
     app = gtk_application_new("si.auralize", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
     status = g_application_run(G_APPLICATION (app), argc, argv);
+    puts("goodbye");
     g_object_unref(app);
 
     return status;
