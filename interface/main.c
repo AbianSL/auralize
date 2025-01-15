@@ -1,4 +1,5 @@
 #include <gtk/gtk.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,13 +14,19 @@ GtkWidget *output_image = NULL;
 FILE *auralize_backend = NULL;
 GThread *backend_thread = NULL;
 
+GtkWidget *pick_audio_button = NULL;
+GtkWidget *classify_button = NULL;
+
 int pipe_front2back[2];
 
 gpointer handle_backend(gpointer data) {
+    close(pipe_front2back[1]);
+
     pid_t pid = 0;
     int pipe_back2py [2];
     int pipe_py2back [2];
-    char buf[256];
+    char py_buf[256];
+    char front_buf[256];
     char msg[256];
     int status;
 
@@ -32,10 +39,28 @@ gpointer handle_backend(gpointer data) {
         dup2(pipe_py2back[1], STDOUT_FILENO);
         close(pipe_back2py[1]);
         close(pipe_py2back[0]);
-        execl("python", "auralize.py");
+        execl("python", "python", "auralize.py", (char*)NULL);
         exit(1);
     }
     // back process
+    close(pipe_back2py[0]);
+    close(pipe_py2back[1]);
+
+    read(pipe_py2back[0], py_buf, 256);
+    if (strcmp(py_buf, "ready") != 0) {
+        printf("backend error in python: %s", py_buf);
+        return NULL;
+    }
+    // unblock buttons
+    gtk_widget_set_sensitive(pick_audio_button, true);
+    gtk_widget_set_sensitive(classify_button, true);
+
+    while (read(pipe_front2back[0], front_buf, 256)) {
+        if (strcmp(front_buf, "e") == 0) break;
+    }
+
+    kill(pid, SIGKILL);
+    wait(NULL);
 
     return NULL;
 }
@@ -98,11 +123,6 @@ static void activate(GtkApplication* app, gpointer user_data) {
     GtkWidget *button;
     GtkWidget *logo;
 
-    if (pipe(pipe_front2back) < 0) {
-        puts("pipe error");
-        return;
-    }
-
     window = gtk_application_window_new (app);
     gtk_window_set_title (GTK_WINDOW(window), "Auralize");
     gtk_window_set_default_size (GTK_WINDOW(window), 200, 200);
@@ -136,13 +156,13 @@ static void activate(GtkApplication* app, gpointer user_data) {
     gtk_widget_set_halign(output_box, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(output_box, GTK_ALIGN_CENTER);
 
-    button = gtk_button_new_with_label ("Pick audio");
-    g_signal_connect(button, "clicked", G_CALLBACK(open_audio_picker), NULL);
-    gtk_box_append(GTK_BOX(buttons_box), button);
+    pick_audio_button = gtk_button_new_with_label ("Pick audio");
+    g_signal_connect(pick_audio_button, "clicked", G_CALLBACK(open_audio_picker), NULL);
+    gtk_box_append(GTK_BOX(buttons_box), pick_audio_button);
 
-    button = gtk_button_new_with_label("Classify");
-    g_signal_connect(button, "clicked", G_CALLBACK(classify_audio), NULL);
-    gtk_box_append(GTK_BOX(buttons_box), button);
+    classify_button = gtk_button_new_with_label("Classify");
+    g_signal_connect(classify_button, "clicked", G_CALLBACK(classify_audio), NULL);
+    gtk_box_append(GTK_BOX(buttons_box), classify_button);
 
     button = gtk_button_new_with_label ("Quit");
     g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_destroy), window);
@@ -159,14 +179,23 @@ static void activate(GtkApplication* app, gpointer user_data) {
     gtk_window_maximize(GTK_WINDOW(window));
 }
 
+gpointer start_backend() {
+    pipe(pipe_front2back);
+    gpointer backend_thread = g_thread_new("auralize.backend", handle_backend, NULL);
+    close(pipe_front2back[0]);
+    return backend_thread;
+}
+
 int main(int argc, char** argv) {
     GtkApplication *app;
     int status;
 
     app = gtk_application_new("si.auralize", G_APPLICATION_DEFAULT_FLAGS);
     g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
+    backend_thread = start_backend();
     status = g_application_run(G_APPLICATION (app), argc, argv);
-    puts("goodbye");
+    write(pipe_front2back[1], "e", 256);
+    g_thread_join(backend_thread);
     g_object_unref(app);
 
     return status;
