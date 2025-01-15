@@ -1,10 +1,11 @@
-import audio_file_names as afn
-from audio.input import Audio
 
 from pathlib import Path
 import os
 import sys
 
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from audio.input import Audio
+import audio_file_names as afn
 # local paths
 DOWNLOAD_DIR = Path("esc50_data")
 AUDIO_DIR = DOWNLOAD_DIR / "audio"
