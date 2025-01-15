@@ -1,5 +1,5 @@
-from ..Audio.input import Audio 
 from ..download import download_all_files
+from ..audio.input import Audio 
 
 from pathlib import Path
 import numpy as np
@@ -36,8 +36,7 @@ class SpectrogramTrainer:
         """
             Load data
         """
-        self._load_spectrograms()
-        self._load_labels()
+        pass 
 
     def train(self):
         """
@@ -66,17 +65,12 @@ class SpectrogramTrainer:
         # TODO: how to train the model
         # self.model.fit(self.spectrograms, self.labels, epochs=10, batch_size=32)
 
-    def _load_spectrograms(self):
+    def _clasify_spectrogram(self, csv_file: Path):
         """
-            Load spectrograms
+            Classify a spectrogram
+            Args:
+                csv_file: Path to the csv file
         """
-        pass 
-
-    def _load_labels(self):
-        """
-            Load labels
-        """
-        pass 
 
 if __name__ == "__main__":
 
