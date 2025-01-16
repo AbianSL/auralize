@@ -1,5 +1,4 @@
-from ..download import download_all_files
-from ..audio.input import Audio 
+from audio.input import Audio 
 
 from pathlib import Path
 import numpy as np
@@ -7,16 +6,18 @@ import os
 
 import tensorflow as tf
 import pandas as pd
-from keras.preprocessing import image
 from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
+from keras.preprocessing import image
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Flatten, Dense
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import matplotlib.pyplot as plt
 
 class SpectrogramTrainer:
     def __init__(self, spectrogram_dir: Path,
-                 label_csv: Path, model_dir: Path):
+                 label_csv: Path, model_dir: Path) -> None:
         """
             Initialize the spectrogram trainer
             Args:
