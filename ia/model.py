@@ -13,6 +13,7 @@ class ModelLoader(SpectrogramTrainer):
         """
         self.model_path = model_path
         self.model = None
+        # TODO: add labels names
 
     def load_model(self):
         """
