@@ -159,8 +159,13 @@ class SpectrogramTrainer:
             img_array = image.img_to_array(img)
             self.spectrograms.append(img_array)
             self.labels.append(row['category'])
+    
+if __name__ == "__main__":
+    spectrogram_dir = Path("esc50_data/spectrograms")
+    label_csv = Path("esc50_data/esc50.csv")
     model_dir = Path("models")
     trainer = SpectrogramTrainer(spectrogram_dir, label_csv, model_dir)
-    print(trainer.spectrograms)
-    trainer.train()
-    
+    trainer.train(20, 16)
+    trainer.save_model("spectrogram_model_16")
+    trainer.test()
+    trainer.predict(Path("esc50_data/spectrograms/1-100032-A-0.png"))
