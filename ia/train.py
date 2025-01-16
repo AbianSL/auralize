@@ -30,19 +30,39 @@ class SpectrogramTrainer:
         self.model_dir = model_dir
         self.spectrograms = []
         self.labels = []
+        self.x_test = None
+        self.y_test = None
         self.model = Sequential() 
         self._load_data()
 
-    def _load_data(self):
+    def _load_data(self) -> None:
         """
             Load data
         """
-        pass 
+        matches = self._find_spectrogram_labels()
+        self._assing_labels(matches)
 
-    def train(self):
+    def train(self, epochs_arg : int, batch_size_arg : int) -> None:
         """
             Train the model
         """
+
+        x_train, x_test, y_train, y_test = train_test_split(self.spectrograms, self.labels, stratify=self.labels, test_size=0.2, random_state=0)
+        
+        x_train_norm = np.array(x_train) / 255
+        x_test_norm = np.array(x_test) / 255
+        
+        encoder = LabelEncoder()
+
+        y_train_encoded = encoder.fit_transform(y_train)
+        y_train_encoded = to_categorical(y_train_encoded)
+        
+        y_test_encoded = encoder.fit_transform(y_test)
+        y_test_encoded = to_categorical(y_test_encoded)
+
+        self.x_test = x_test_norm
+        self.y_test = y_test_encoded
+
         # layer 1
         self.model.add(Conv2D(32, (3, 3), input_shape=(224, 224, 3), activation='relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
