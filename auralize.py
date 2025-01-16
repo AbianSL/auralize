@@ -30,7 +30,10 @@ if __name__ == "__main__":
                 audio.save_spectrogram(Path("spectrogram.png"));
                 print("done")
 
+            case "classify":
+                time.sleep(2)
+                print("dog obviously") # obv not done yet
+
             case _:
                 pass
-
         msg = input()

@@ -65,7 +65,7 @@ gpointer handle_backend(gpointer data) {
             gtk_widget_set_sensitive(classify_button, false);
             read(pipe_front2back[0], front_buf, 256);
             gtk_label_set_text(GTK_LABEL(output_label), "Generating spectrogram...");
-            write(pipe_back2py[1], "audio\n", 7);
+            write(pipe_back2py[1], "audio\n", 6);
             memset(msg, 0, strlen(msg));
             strcpy(msg, audio_file_path);
             strcat(msg, "\n");
@@ -79,6 +79,14 @@ gpointer handle_backend(gpointer data) {
         }
 
         if (strcmp(front_buf, "c\n") == 0) {
+            gtk_widget_set_sensitive(pick_audio_button, false);
+            gtk_widget_set_sensitive(classify_button, false);
+            gtk_label_set_text(GTK_LABEL(output_label), "Classifying...");
+            write(pipe_back2py[1], "classify\n", 9);
+            read(pipe_py2back[0], py_buf, 256);
+            gtk_label_set_text(GTK_LABEL(output_label), py_buf);
+            gtk_widget_set_sensitive(classify_button, true);
+            gtk_widget_set_sensitive(pick_audio_button, true);
             continue;
         }
 
