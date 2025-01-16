@@ -78,13 +78,23 @@ class SpectrogramTrainer:
 
         self.model.add(Flatten())
         self.model.add(Dense(units=128, activation='relu'))
-        self.model.add(Dense(units=1, activation='sigmoid'))
+        self.model.add(Dense(units=50, activation='sigmoid'))
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         self.model.summary()
 
         print("Training the model")
-        # TODO: how to train the model
-        # self.model.fit(self.spectrograms, self.labels, epochs=10, batch_size=32)
+        hist = self.model.fit(x_train_norm, y_train_encoded, epochs = epochs_arg, batch_size = batch_size_arg, validation_data=(x_test_norm, y_test_encoded))
+        acc = hist.history['accuracy']
+        val_acc = hist.history['val_accuracy']
+        epochs = range(1, len(acc) + 1)
+
+        plt.plot(epochs, acc, '-', label='Training Accuracy')
+        plt.plot(epochs, val_acc, ':', label='Validation Accuracy')
+        plt.title('Training and Validation Accuracy')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.legend(loc='lower right')
+        plt.plot()
 
     def save_model(self, name: str) -> None:
         """
