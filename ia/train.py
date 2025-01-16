@@ -86,26 +86,43 @@ class SpectrogramTrainer:
         # TODO: how to train the model
         # self.model.fit(self.spectrograms, self.labels, epochs=10, batch_size=32)
 
-    def _clasify_spectrogram(self, csv_file: Path):
+    def save_model(self, name: str) -> None:
+        """
+            Save the model
+        """
+        # check if the directory exists
+        if not os.path.exists(self.model_dir):
+            os.makedirs(self.model_dir)
+
+        self.model.save(self.model_dir / (name + ".keras"))
+
+    def _find_spectrogram_labels(self) -> pd.DataFrame:
         """
             Classify a spectrogram
             Args:
                 csv_file: Path to the csv file
         """
 
-if __name__ == "__main__":
+        df = pd.read_csv(self.label_csv)
+        df_truncated = df.iloc[:, [0, 3]]
 
-    # Supongamos que estas son las etiquetas de tu conjunto de datos:
-    labels = [0, 2, 1, 0]
-    
-    # Convertimos a one-hot encoding:
-    one_hot_labels = to_categorical(labels)
-    
-    print(one_hot_labels)
-    
-    pass
-    spectrogram_dir = Path("data/spectrograms")
-    label_csv = Path("data/labels.csv")
+        directory_files = os.listdir(self.spectrogram_dir)
+
+        matching_files = df_truncated[df_truncated['filename'].isin(directory_files)]
+        return matching_files
+
+    def _assing_labels(self, matches: pd.DataFrame) -> None:
+        """
+            Assign labels to the spectrograms
+            Args:
+                matches: DataFrame with the matching files
+        """
+        for index, row in matches.iterrows():
+            file_path = self.spectrogram_dir / row['filename']
+            img = image.load_img(file_path, target_size=(224, 224))
+            img_array = image.img_to_array(img)
+            self.spectrograms.append(img_array)
+            self.labels.append(row['category'])
     model_dir = Path("models")
     trainer = SpectrogramTrainer(spectrogram_dir, label_csv, model_dir)
     print(trainer.spectrograms)
