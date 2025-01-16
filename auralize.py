@@ -1,12 +1,16 @@
+#!/usr/bin/python
+
+from logging import error
+import time
 import numpy as np
 # import tensorflow as tf
 
 from pathlib import Path
-from sys import argv
 from audio.input import Audio
 
 def load_model():
-    pass
+    time.sleep(1)
+    return "anything"
     # return tf.keras.models.load_model("auralize_model.keras", None, True)
 
 
@@ -21,9 +25,10 @@ if __name__ == "__main__":
         match msg:
             case "audio":
                 audio_path = input()
+                audio_path = audio_path.replace('\x00', '')
                 audio = Audio(Path(audio_path))
                 audio.save_spectrogram(Path("spectrogram.png"));
-                pass
+                print("done")
 
             case _:
                 pass
