@@ -85,7 +85,7 @@ def convert_all_files():
         from tqdm import tqdm
         for audio_file in tqdm(afn.audio_names):
             # -4 to remove the .wav extension
-            save_path = SPEC_DIR / (audio_file[:-5] + ".png")
+            save_path = SPEC_DIR / (audio_file[:-4] + ".png")
             audio_path = AUDIO_DIR / audio_file
             if save_path.exists():
                 continue
@@ -100,7 +100,7 @@ def convert_all_files():
     else:
         for audio_file in afn.audio_names:
             # -4 to remove the .wav extension
-            save_path = SPEC_DIR / (audio_file[:-5] + ".png")
+            save_path = SPEC_DIR / (audio_file[:-4] + ".png")
             audio_path = AUDIO_DIR / audio_file
             if save_path.exists():
                 print(f"{GREEN}{tick}{RESET}")
