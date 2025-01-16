@@ -95,6 +95,32 @@ class SpectrogramTrainer:
         plt.ylabel('Accuracy')
         plt.legend(loc='lower right')
         plt.plot()
+    
+    def test(self) -> None:
+        """
+            Test the model
+        """
+        print("Testing the model")
+        loss, accuracy = self.model.evaluate(self.x_test, self.y_test)
+        print(f"Loss: {loss}")
+        print(f"Accuracy: {accuracy}")
+    
+    def predict(self, img_path: Path) -> None:
+        """
+            Predict the category of a spectrogram
+            Args:
+                img_path: Path to the spectrogram
+        """
+        img = image.load_img(img_path, target_size=(224, 224))
+        img_array = image.img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = img_array / 255
+
+        prediction = self.model.predict(img_array)
+        predicted_classes = prediction.argmax(axis=1)
+        predicted_labels = [self.labels[i] for i in predicted_classes]
+        
+        print(predicted_labels)
 
     def save_model(self, name: str) -> None:
         """
