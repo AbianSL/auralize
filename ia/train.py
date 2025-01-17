@@ -4,13 +4,16 @@ from pathlib import Path
 import numpy as np
 import os
 
+from typing import List
 import tensorflow as tf
 import pandas as pd
+import json
 from tensorflow.keras.utils import to_categorical
+from keras.callbacks import TensorBoard
 from keras.preprocessing import image
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Flatten, Dense
+from keras.layers import Flatten, Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import matplotlib.pyplot as plt
@@ -27,6 +30,7 @@ class SpectrogramTrainer:
         """
         self.spectrogram_dir = spectrogram_dir
         self.label_csv = label_csv
+        self.amount_of_labels = 0
         self.model_dir = model_dir
         self.spectrograms = []
         self.labels = []
@@ -55,6 +59,8 @@ class SpectrogramTrainer:
 
         self.x_test = x_test_norm
         self.y_test = y_test_encoded
+        
+        tensorboard = TensorBoard(log_dir="logs/spectrogram_model_100")
 
         # layer 1
         self.model.add(Conv2D(32, (3, 3), input_shape=(224, 224, 3), activation='relu'))
@@ -76,7 +82,7 @@ class SpectrogramTrainer:
         self.model.summary()
 
         print("Training the model")
-        hist = self.model.fit(x_train_norm, y_train_encoded, epochs = epochs_arg, batch_size = batch_size_arg, validation_data=(x_test_norm, y_test_encoded))
+        hist = self.model.fit(x_train_norm, y_train_encoded, epochs = epochs_arg, batch_size = batch_size_arg, validation_data=(x_test_norm, y_test_encoded), callbacks=[tensorboard])
         acc = hist.history['accuracy']
         val_acc = hist.history['val_accuracy']
         epochs = range(1, len(acc) + 1)
