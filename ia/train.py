@@ -170,10 +170,18 @@ class SpectrogramTrainer:
         """
         for index, row in matches.iterrows():
             file_path = self.spectrogram_dir / row['filename']
-            img = image.load_img(file_path, target_size=(224, 224))
+            img = image.load_img(file_path, target_size=(224, 224, 3))
             img_array = image.img_to_array(img)
             self.spectrograms.append(img_array)
             self.labels.append(row['category'])
+            
+            # TODO: CLEAN DEBUG
+            if index == 0:
+                print(f"File path: {file_path}")
+                print(f"Category: {row['category']}\n\n\n")
+            if row['filename'] == '1-137-A-32.png':
+                print(f"File path: {file_path}")
+                print(f"Category: {row['category']}\n\n\n")
     
 if __name__ == "__main__":
     spectrogram_dir = Path("esc50_data/spectrograms")
