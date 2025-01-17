@@ -104,7 +104,7 @@ class SpectrogramTrainer:
         print(f"Loss: {loss}")
         print(f"Accuracy: {accuracy}")
     
-    def predict(self, img_path: Path) -> None:
+    def predict(self, img_path: Path) -> List[str]:
         """
             Predict the category of a spectrogram
             Args:
@@ -119,7 +119,7 @@ class SpectrogramTrainer:
         predicted_classes = prediction.argmax(axis=1)
         predicted_labels = [self.labels[i] for i in predicted_classes]
         
-        print(predicted_labels)
+        return predicted_labels
 
     def save_model(self, name: str) -> None:
         """
@@ -155,6 +155,7 @@ class SpectrogramTrainer:
 
         df = pd.read_csv(self.label_csv)
         df_truncated = df.iloc[:, [0, 3]]
+        self.amount_of_labels = len(df_truncated['category'].unique())
 
         directory_files = os.listdir(self.spectrogram_dir)
 
@@ -179,7 +180,9 @@ if __name__ == "__main__":
     label_csv = Path("esc50_data/esc50.csv")
     model_dir = Path("models")
     trainer = SpectrogramTrainer(spectrogram_dir, label_csv, model_dir)
-    trainer.train(20, 16)
-    trainer.save_model("spectrogram_model_16")
+    trainer.train(100, 32)
+    trainer.save_model("spectrogram_model_test")
     trainer.test()
-    trainer.predict(Path("esc50_data/spectrograms/1-100032-A-0.png"))
+    output = trainer.predict(Path("esc50_data/spectrograms/1-137-A-32.png"))
+    print(output)
+
