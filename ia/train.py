@@ -131,6 +131,21 @@ class SpectrogramTrainer:
             os.makedirs(self.model_dir)
 
         self.model.save(self.model_dir / (name + ".keras"))
+        self._save_labels()
+
+    def _save_labels(self) -> None:
+        """
+            Save labels
+        """
+        with open("labels.json", "w", encoding="utf-8") as f:
+            json.dump(self.labels, f)
+
+    def _load_data(self) -> None:
+        """
+            Load data
+        """
+        matches = self._find_spectrogram_labels()
+        self._assing_labels(matches)
 
     def _find_spectrogram_labels(self) -> pd.DataFrame:
         """
