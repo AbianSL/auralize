@@ -35,19 +35,12 @@ class SpectrogramTrainer:
         self.model = Sequential() 
         self._load_data()
 
-    def _load_data(self) -> None:
-        """
-            Load data
-        """
-        matches = self._find_spectrogram_labels()
-        self._assing_labels(matches)
-
     def train(self, epochs_arg : int, batch_size_arg : int) -> None:
         """
             Train the model
         """
 
-        x_train, x_test, y_train, y_test = train_test_split(self.spectrograms, self.labels, stratify=self.labels, test_size=0.2, random_state=0)
+        x_train, x_test, y_train, y_test = train_test_split(self.spectrograms, self.labels, stratify=self.labels, test_size=0.3, random_state=0)
         
         x_train_norm = np.array(x_train) / 255
         x_test_norm = np.array(x_test) / 255
