@@ -1,8 +1,5 @@
-#!/home/neyhden/.pyenv/versions/3.10.16/bin/python
+#!/usr/bin/python
 import sys
-
-sys.path.append('/home/neyhden/.pyenv/versions/3.10.16/lib')
-
 from pathlib import Path
 from ia.audio.input import Audio
 from ia.model import ModelLoader
@@ -28,7 +25,6 @@ if __name__ == "__main__":
 
             case "classify":
                 prediction = model.predict(save_path)[0]
-                sys.stderr.write(prediction)
                 print(prediction)
 
             case _:

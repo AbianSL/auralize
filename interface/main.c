@@ -50,12 +50,6 @@ gpointer handle_backend(gpointer data) {
     close(pipe_py2back[1]);
 
     read(pipe_py2back[0], py_buf, 256);
-    /*
-    if (strcmp(py_buf, "ready\n") != 0) {
-        printf("backend error in python: %s\n", py_buf);
-        return NULL;
-    }
-    */
     // unblock buttons
     puts("unblocking buttons");
     gtk_widget_set_sensitive(pick_audio_button, true);
@@ -85,16 +79,18 @@ gpointer handle_backend(gpointer data) {
             gtk_widget_set_sensitive(pick_audio_button, false);
             gtk_widget_set_sensitive(classify_button, false);
             gtk_label_set_text(GTK_LABEL(output_label), "Classifying...");
+            puts("text set");
             write(pipe_back2py[1], "classify\n", 9);
             read(pipe_py2back[0], py_buf, 256);
-            printf("CLASSIFICATION:\n%s\nEND CLASSIFICATION\n", py_buf);
+            puts("pipes read");
             gtk_label_set_text(GTK_LABEL(output_label), py_buf);
+            memset(py_buf, 0, strlen(py_buf));
+            puts("buf cleaned");
             gtk_widget_set_sensitive(classify_button, true);
             gtk_widget_set_sensitive(pick_audio_button, true);
             continue;
         }
 
-        printf("FRONT_BUF CONTENTS:\n%s\nFRONT_BUF CONTENTS END;\n", front_buf);
         memset(front_buf, 0, strlen(front_buf));
     }
 
