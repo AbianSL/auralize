@@ -39,6 +39,7 @@ gpointer handle_backend(gpointer data) {
         dup2(pipe_py2back[1], STDOUT_FILENO);
         close(pipe_back2py[1]);
         close(pipe_py2back[0]);
+        
         if (execl("./auralize.py", "./auralize.py", (char*)NULL) < 0) {
             puts("execl error");
             exit(1);

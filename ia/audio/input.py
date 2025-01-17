@@ -59,8 +59,11 @@ class Audio:
             print(f"Saving spectrogram to {save_path}")
         try:
             librosa.display.specshow(librosa.power_to_db(self._spectrogram, ref=np.max), sr=self._sr)
-            plt.colorbar(format='%+2.0f dB')
-            plt.savefig(save_path)
+            if verbose:
+                plt.colorbar(format='%+2.0f dB')
+            else:
+                plt.axis('off')
+            plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
             if verbose:
                 print("Spectrogram saved successfully")
                 print(f"Spectrogram saved to {save_path}")

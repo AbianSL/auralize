@@ -164,3 +164,7 @@ cython_debug/
 # esc50_data
 esc50_data/
 esc50_data/*/
+
+
+ia/models/*.keras
+ia/models/*.h1

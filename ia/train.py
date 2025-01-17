@@ -1,4 +1,4 @@
-from audio.input import Audio 
+from .audio.input import Audio 
 
 from pathlib import Path
 import numpy as np
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     label_csv = Path("esc50_data/esc50.csv")
     model_dir = Path("models")
     trainer = SpectrogramTrainer(spectrogram_dir, label_csv, model_dir)
-    trainer.train(100, 32)
+    trainer.train(14, 32)
     trainer.save_model("spectrogram_model_test")
     trainer.test()
     output = trainer.predict(Path("esc50_data/spectrograms/1-137-A-32.png"))

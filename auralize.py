@@ -1,23 +1,24 @@
-#!/usr/bin/python
+#!venv/bin/python3
+import sys
+
+sys.path.append('venv/bin/python3')
+
 
 from logging import error
 import time
 import numpy as np
-# import tensorflow as tf
 
 from pathlib import Path
-from audio.input import Audio
+from ia.audio.input import Audio
+from ia.model import ModelLoader
 
-def load_model():
-    time.sleep(1)
-    return "anything"
-    # return tf.keras.models.load_model("auralize_model.keras", None, True)
-
+MODEL_PATH = Path("ia/models/spectrogram_model_test.keras")
 
 if __name__ == "__main__":
-    model = load_model()
+    model = ModelLoader(MODEL_PATH)
     audio = None
-    msg = "";
+    msg = ""
+    save_path = Path("spectrogram.png") 
 
     print("ready")
 
@@ -27,12 +28,11 @@ if __name__ == "__main__":
                 audio_path = input()
                 audio_path = audio_path.replace('\x00', '')
                 audio = Audio(Path(audio_path))
-                audio.save_spectrogram(Path("spectrogram.png"));
+                audio.save_spectrogram(save_path)
                 print("done")
 
             case "classify":
-                time.sleep(2)
-                print("dog obviously") # obv not done yet
+                print(model.predict(save_path))
 
             case _:
                 pass
