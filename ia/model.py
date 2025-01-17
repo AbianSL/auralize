@@ -1,4 +1,5 @@
 import tensorflow as tf
+import json
 from pathlib import Path
 
 from train import SpectrogramTrainer
@@ -13,7 +14,8 @@ class ModelLoader(SpectrogramTrainer):
         """
         self.model_path = model_path
         self.model = None
-        # TODO: add labels names
+        self.labels = None
+        self._load_labels()
 
     def load_model(self):
         """
@@ -26,6 +28,7 @@ class ModelLoader(SpectrogramTrainer):
             print(f"Model successfully loaded from: {self.model_path}")
         except Exception as e:
             raise FileNotFoundError(f"Error loading the model: {e}")
+
     def get_summary(self):
         """
         Returns a summary of the loaded model.
@@ -36,17 +39,29 @@ class ModelLoader(SpectrogramTrainer):
             raise ValueError("The model is not loaded. Use the load_model method first.")
 
         self.model.summary()
+    
+    def _load_labels(self):
+        """
+        Loads the labels from the label file.
+
+        :raises FileNotFoundError: If the file does not exist.
+        """
+        try:
+            with open("labels.json", "r") as file:
+                self.labels = json.load(file)
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Error loading labels: {e}")
 
 # Example usage
 if __name__ == "__main__":
     # Replace 'path_to_model.h5' with the actual path to your model
-    model_loader = ModelLoader(Path("models/spectrogram_model_16.keras"))
+    model_loader = ModelLoader(Path("models/spectrogram_model_test.keras"))
     
     try:
         model_loader.load_model()
         model_loader.get_summary()
 
-        predictions = model_loader.predict(Path("esc50_data/spectrograms/1-100032-A-0.png"))
+        predictions = model_loader.predict(Path("esc50_data/spectrograms/1-137-A-32.png"))
         print("Predictions:", predictions)
 
     except FileNotFoundError as e:
