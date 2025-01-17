@@ -1,12 +1,7 @@
-#!venv/bin/python3
+#!/home/neyhden/.pyenv/versions/3.10.16/bin/python
 import sys
 
-sys.path.append('venv/bin/python3')
-
-
-from logging import error
-import time
-import numpy as np
+sys.path.append('/home/neyhden/.pyenv/versions/3.10.16/lib')
 
 from pathlib import Path
 from ia.audio.input import Audio
@@ -20,7 +15,7 @@ if __name__ == "__main__":
     msg = ""
     save_path = Path("spectrogram.png") 
 
-    print("ready")
+    sys.stdout.write("ready")
 
     while msg != "exit":
         match msg:
@@ -32,7 +27,9 @@ if __name__ == "__main__":
                 print("done")
 
             case "classify":
-                print(model.predict(save_path))
+                prediction = model.predict(save_path)[0]
+                sys.stderr.write(prediction)
+                print(prediction)
 
             case _:
                 pass

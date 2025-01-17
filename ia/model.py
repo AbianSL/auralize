@@ -27,7 +27,7 @@ class ModelLoader(SpectrogramTrainer):
         self.model_path = model_path
         try:
             self.model = tf.keras.models.load_model(self.model_path)
-            print(f"Model successfully loaded from: {self.model_path}")
+            # print(f"Model successfully loaded from: {self.model_path}")
         except Exception as e:
             raise FileNotFoundError(f"Error loading the model: {e}")
 
@@ -49,7 +49,7 @@ class ModelLoader(SpectrogramTrainer):
         :raises FileNotFoundError: If the file does not exist.
         """
         try:
-            with open("./labels.json", "r") as file:
+            with open("./ia/labels.json", "r") as file:
                 self.labels = json.load(file)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"Error loading labels: {e}")

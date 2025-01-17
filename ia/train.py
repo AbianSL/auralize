@@ -1,5 +1,3 @@
-from .audio.input import Audio 
-
 from pathlib import Path
 import numpy as np
 import os
@@ -118,7 +116,7 @@ class SpectrogramTrainer:
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255
 
-        prediction = self.model.predict(img_array)
+        prediction = self.model.predict(img_array, verbose=0)
         predicted_classes = prediction.argmax(axis=1)
         predicted_labels = [self.labels[i] for i in predicted_classes]
         
