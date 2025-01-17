@@ -63,6 +63,15 @@ default values are 14 epochs and 32 batches.
     python train.py
 ```
 
+To use the last model you need to run the model.py
+file in the ia folder. The model.py file will load
+the last model and predict the sound of the file 
+path put in the predict function.
+
+```bash
+    python model.py
+```
+
 ## Usage
 
 To run the app you need to run the Makefile in the 
