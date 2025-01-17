@@ -42,7 +42,7 @@ class SpectrogramTrainer:
             Train the model
         """
 
-        x_train, x_test, y_train, y_test = train_test_split(self.spectrograms, self.labels, stratify=self.labels, test_size=0.3, random_state=0)
+        x_train, x_test, y_train, y_test = train_test_split(self.spectrograms, self.labels, stratify=self.labels, test_size=0.3)
         
         x_train_norm = np.array(x_train) / 255
         x_test_norm = np.array(x_test) / 255
