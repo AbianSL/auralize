@@ -66,18 +66,21 @@ class SpectrogramTrainer:
         self.model.add(Conv2D(32, (3, 3), input_shape=(224, 224, 3), activation='relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
         # layer 2
-        self.model.add(Conv2D(32, (3, 3), activation='relu'))
-        self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        # layer 3
         self.model.add(Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(MaxPooling2D(pool_size=(2, 2)))
+        self.model.add(Dropout(0.30))
+
+        # layer 3
+        self.model.add(Conv2D(128, (3, 3), activation='relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
         # layer 4
-        self.model.add(Conv2D(64, (3, 3), activation='relu'))
+        self.model.add(Conv2D(128, (3, 3), activation='relu'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
-
+        self.model.add(Dropout(0.30))
+        
         self.model.add(Flatten())
-        self.model.add(Dense(units=128, activation='relu'))
-        self.model.add(Dense(units=50, activation='sigmoid'))
+        self.model.add(Dense(units=1024, activation='relu'))
+        self.model.add(Dense(units=self.amount_of_labels, activation='softmax'))
         self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
         self.model.summary()
 
